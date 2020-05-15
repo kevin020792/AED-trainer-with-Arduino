@@ -51,8 +51,15 @@ Wires and a circuit board
 
 Suitable case for all the electronics
 
-Some voice files that can simulate an working AED, for instance: "Apply the pads to the bare skin as instructions", "Do not touch the patient"...and so on. (Not included in this github project, they should be prepared by your own.)
-
+Some voice files that can simulate an working AED, for instance: 
+"System booting up"
+"Stay calm and call 911"
+"Plug the electrode and apply the pads to bare skin as instructions"
+"Evaluating heart rhythm, do not touch the patient"
+"Shock recommended, press the shock button to deliver shocks"
+"Shock delivered, continue CPR"
+"No shock advised, please continue CPR"
+The audio files are not included in this project and should be prepared by your own.
 
 To connect the Arduino Pro Mini to your PC, you might need a USB to UART tool such as CP2102 or CH340G.
 
