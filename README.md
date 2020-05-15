@@ -54,19 +54,19 @@ Suitable case for all the electronics
 
 Some voice files that can simulate an working AED, for instance: 
 
-"System booting up"
+"System booting up" (File 0001.mp3)
 
-"Stay calm and call 911"
+"Stay calm and call 911" (0002.mp3)
 
-"Plug the electrode and apply the pads to bare skin as instructions"
+"Plug the electrode and apply the pads to bare skin as instructions" (0003.mp3)
 
-"Evaluating heart rhythm, do not touch the patient"
+"Evaluating heart rhythm, do not touch the patient" (0004.mp3)
 
-"Shock recommended, press the shock button to deliver shocks"
+"Shock recommended, press the shock button to deliver shocks" (0005.mp3)
 
-"Shock delivered, continue CPR"
+"Shock delivered, continue CPR" (0006.mp3)
 
-"No shock advised, please continue CPR"
+"No shock advised, please continue CPR" (0007.mp3)
 
 The audio files are not included in this project and should be prepared by your own.
 
