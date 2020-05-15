@@ -70,6 +70,7 @@ Some voice files that can simulate an working AED, for instance:
 
 The audio files are not included in this project and should be prepared by your own.
 
+The signals of the remote controls are different among them, you should run the "IRreceive" demo to figure out the corresponding signals and the buttons.
 
 To connect the Arduino Pro Mini to your PC, you might need a USB to UART tool such as CP2102 or CH340G.
 
