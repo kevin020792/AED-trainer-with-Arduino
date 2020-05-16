@@ -4,74 +4,74 @@
 
 #include "Arduino.h"  
 #include "SoftwareSerial.h"                    
-#include "DFRobotDFPlayerMini.h"        // 採用DFRobotDFPlayerMini程式庫  
-#include "IRremote.h" //使用IRremote程式庫
+#include "DFRobotDFPlayerMini.h"  // Use DFRobotDFPlayerMini library 
+#include "IRremote.h" //Use IRremote library
 
 SoftwareSerial mySoftwareSerial(2, 3);
-//mySoftwareSerial(RX, TX),宣告軟體序列傳輸埠  
+//mySoftwareSerial(RX, TX), declare software serial port  
 
 int RECV_PIN = 11;
 long pre_time_pad = 0;
 long pre_time_shock = 0;
 long pre_time_buzzer_latency = 0;
 long pre_time_beep = 0;
-int led_state_pad = LOW; //貼上貼片LED燈燈號
-int led_state_shock = LOW; //電擊LED燈燈號
-int buzzer_state = LOW;
-int flash_time = 500; //電擊鈕LED燈每500秒閃爍一次
-int buzzer_time = 200; //蜂鳴器每600毫秒交替一次，每次響200ms沉默400ms，配合CPR每分鐘100下的頻率
-long beep_time = 120000; //蜂鳴器只會運作2分鐘(120000ms);
-int pad_led = 0; //貼上貼片LED燈燈號狀態指標，0與其他熄滅、1閃爍、2恆亮
-bool pluged = false; //檢測教官是否已按下"不要觸碰病人，正在分析"
-bool detected = false; //按鈕有沒有被按下過
-bool gotoshock = false; //使用boolean控制是否進入要走電擊迴圈
+int led_state_pad = LOW; //LED light signal for "apply the pad"
+int led_state_shock = LOW; //LED light signal for "stand by to shock"
+int buzzer_state = LOW; 
+int flash_time = 500; //The LED light signal for "stand by to shock" will flash per 500ms
+int buzzer_time = 200; //The buzzer will beep per 600ms, 200 HIGH and 400 LOW
+long beep_time = 120000; //The buzzer will only work for 2 minutes (120000 ms)
+int pad_led = 0; //The index for the LED signal "apply the pad", 0 and other: LOW; 1 for flash and 2 for always HIGH
+bool pluged = false; //Check if the pad is attached
+bool detected = false; //Check if the shock button is pressed
+bool gotoshock = false; //Control the circle 
 bool butt = false;
-bool cprbeep = false;
+bool cprbeep = false; 
 bool shock_led =false;
-bool beeped = false; //開啟或關閉吵死人的蜂鳴器
+bool beeped = false; //Control the On/Off of the buzzer
 
 IRrecv irrecv(RECV_PIN);
 
 decode_results results;
   
-DFRobotDFPlayerMini myDFPlayer;         //宣告MP3 Player  
-void printDetail(uint8_t type, int value);  //印出詳情  
+DFRobotDFPlayerMini myDFPlayer;         //Declare MP3 Player  
+void printDetail(uint8_t type, int value);  //Print the details of the DFPlayer Mini  
   
 // the setup function runs once when you press reset or power the board  
 void setup()   
 {  
-    Serial.begin(115200);            // 定義Serial Baud
-    mySoftwareSerial.begin(9600);  // 定義mySoftwareSerial baud
+    Serial.begin(115200);          //Define Serial Baud
+    mySoftwareSerial.begin(9600);  //Define mySoftwareSerial baud
   
     Serial.println(F("DFRobot DFPlayer Mini Demo"));   
     Serial.println(F("Initializing DFPlayer ... (May take 3~5 seconds)"));  
     bool is_init_success = myDFPlayer.begin(mySoftwareSerial);  
 
-    //設定LED
-     pinMode(4, OUTPUT); //系統正常
-     pinMode(5, OUTPUT); //保持鎮定尋求救援
-     pinMode(6, OUTPUT); //貼上電極貼片
-     pinMode(7, OUTPUT); //建議電擊按鈕閃爍
-     //LED設定完成
-     //設定按鈕
-     pinMode(8, INPUT); //按鈕用的接腳 
-     //按鈕設定完成
-     //設定Busy輸入
-     pinMode(9, INPUT); //Busy接腳用，偵測HIGH或LOW
-     //Busy偵測接腳已指定
-     //設定蜂鳴器
-     pinMode(10, OUTPUT); //5V蜂鳴器接在Pin 10
-     //蜂鳴器接腳已指定
-     //燈號全暗
+    //Setup the pins for LEDs
+     pinMode(4, OUTPUT); //System is booting up
+     pinMode(5, OUTPUT); //Stay calm and call 911
+     pinMode(6, OUTPUT); //Apply the pads and plug the electrodes
+     pinMode(7, OUTPUT); //Shock recommended
+     
+     //Setup the pin to detect the button
+     pinMode(8, INPUT); //Pin 8 for the shock button
+    
+     //Setup the pin to detect Busy on DFPlayer Mini
+     pinMode(9, INPUT); //Pin 9 for the "Busy" pin on DFPlayer Mini
+     
+     //Setup the pin for buzzer
+     pinMode(10, OUTPUT); //5V buzzer on Pin 10
+     
+     //Shut down all LED
      digitalWrite(4, LOW);
      digitalWrite(5, LOW);
      digitalWrite(6, LOW);
      digitalWrite(7, LOW);
-     //燈號已全暗
+     //All LED are LOW now
      
      irrecv.enableIRIn(); // Start the IR receiver
     
-    if (is_init_success == false)    // 如果DFPlayer Mini回應不正確.  
+    if (is_init_success == false)    // If DFPlayer Mini is not available.  
     {  //Use softwareSerial to communicate with mp3.   
         Serial.println(F("Unable to begin:"));                      
         Serial.println(F("1.Please recheck the connection!"));  
@@ -80,7 +80,7 @@ void setup()
     }  
      
     Serial.println(F("DFPlayer Mini online."));
-    // 如果DFPlayer Mini回應正確.印出"DFPlayer Mini online."  
+    // Print "DFPlayer Mini online." if it is available 
     
      myDFPlayer.setTimeOut(500); // 設定通訊逾時為500ms  
   
@@ -92,26 +92,26 @@ void setup()
   
   
      myDFPlayer.enableDAC();     //Enable On-chip DAC  
-     digitalWrite(4, HIGH); //系統指示燈亮起
-     myDFPlayer.play(1); //系統正常
+     digitalWrite(4, HIGH); //LED signal for system booting
+     myDFPlayer.play(1); //Play "System is booting up"
      delay(2500);
-     Serial.println("sys normal played");
-     digitalWrite(5, HIGH); //保持鎮定尋求救援燈亮起
-     myDFPlayer.play(2); //保持鎮定尋求救援
+     Serial.println("System booting up");
+     digitalWrite(5, HIGH); //LED signal for "Stay calm and call for help"
+     myDFPlayer.play(2); //Play "Stay calm and call 911"
      delay(2500);
-     Serial.println("stay calm played");
+     Serial.println("Stay calm and call 911");
      pad_led = 1;
-     myDFPlayer.loop(3); //開始要求插電極
-     Serial.println("Plug the pad and wait for instructions");
+     myDFPlayer.loop(3); //Loop "Plug the electrode and apply the pads to bare skin as instructions"
+     Serial.println("Plug the electrode and apply the pads to bare skin as instructions");
     
 }  
   
-void(* resetFunc) (void) = 0; //重啟指令集
+void(* resetFunc) (void) = 0; //Reset Arduino
 
 void loop()   
 {  
-    if (myDFPlayer.available())  // 監視MP3有沒有回應  
-    {                                          // 有的話印出詳情  
+    if (myDFPlayer.available())  // Monitoring the DFPlayer Mini 
+    {                   
         printDetail(myDFPlayer.readType(), myDFPlayer.read());
         //Print the detail message from DFPlayer to handle different errors and states.  
     }  
@@ -119,19 +119,19 @@ void loop()
     if (irrecv.decode(&results)) 
     {
       
-       Serial.println(results.value); //教官按下"1"，學員已貼貼片
-       if(results.value == 16724175)  //撥放不要觸碰病人，正在分析
+       Serial.println(results.value); 
+       if(results.value == 16724175)  //Press "1" to play "Evaluating heart rhythm, do not touch the patient"
        {  
         pad_led = 2;
         gotoshock = false;
-        pluged = true;
+        pluged = true; //This part must be run first to run the other demonstrations.
         digitalWrite(10, LOW);
         Serial.println(results.value);  
         myDFPlayer.loop(4);  
         Serial.println("play 4");    
                 
       } 
-      else if (results.value == 16718055){ //教官按下"2"，撥放建議除顫
+      else if (results.value == 16718055){ //Press "2" to play "Shock recommended, press the shock button to deliver shocks"
          Serial.println(results.value); 
         if (pluged == true){
          pad_led = 2; 
@@ -139,12 +139,12 @@ void loop()
          digitalWrite(10, LOW);
          myDFPlayer.loop(5);  
          Serial.println("play 5_Suggest_Defib");
-         gotoshock = true;  //啟動偵測按鈕迴圈
+         gotoshock = true;  //Engage the loop to detect whether the button is pressed or not
          detected = false;
          Serial.println("Go to the if loop for shock");
         }
       }
-      else if (results.value ==16743045){ //教官按下"3"，撥放不建議除顫
+      else if (results.value ==16743045){ //Press "3" to play "No shock advised, please continue"
          Serial.println(results.value);  
         if(pluged == true){
           gotoshock = false;
@@ -157,26 +157,18 @@ void loop()
         }
                 
       }
-      else if (results.value == 16732845) { //教官按下"9"，播搞笑
-        gotoshock = false;
-        cprbeep = false;
-        digitalWrite(10, LOW);
-        Serial.println(results.value);
-        myDFPlayer.play(9); //撥放"皮諾可這個直接電死"
-        Serial.println("play 9");
-      }
-      else if (results.value ==16754775){ //教官按下"+"，增加音量
+      else if (results.value ==16754775){ //Press "+" to increase the volume
         Serial.println(results.value);  
         myDFPlayer.volumeUp();
         Serial.println("volume up");                
       }
-      else if (results.value ==16769055){ //教官按下"-"，降低音量
+      else if (results.value ==16769055){ //Press "-" to lower the volume
         Serial.println(results.value);  
         myDFPlayer.volumeDown();
         Serial.println("volume down");                
       }
-      else if (results.value ==16748655){ //教官按下EQ，重新來過
-        resetFunc(); //執行重啟指令
+      else if (results.value ==16748655){ //Press "EQ" button to reset the system
+        resetFunc(); //Reset Arduino
       }
       else {
       
@@ -194,23 +186,21 @@ void loop()
        if(butt == true){
           Serial.println("Shocked, Goto CPR");
           detected = true;
-          myDFPlayer.play(7); //電擊完成，繼續CPR
+          myDFPlayer.play(7); //"Shock delivered, continue CPR"
           butt = false;
           cprbeep = true;  
         }
       
    }
-    if (cprbeep == true){ //準備撥放CPR頻率聲
+    if (cprbeep == true){ //Prepare to make the buzzer simulate the compress frequency
      if(digitalRead(9) == HIGH){
-     // myDFPlayer.play(8); //2分鐘逼逼聲
-     //cprbeep = false;
       buzzer_control();
       gotoshock = false;
       
      }
     }
     
-   pad_led_control(); //貼上電擊貼片並插入電極的LED指示燈，1是閃爍2是恆亮
+   pad_led_control(); //
    shock_led_control();
    
 }    
@@ -278,11 +268,11 @@ void readpin8val(){
   if (digitalRead(8)==HIGH){
         butt = true;
         Serial.println("電擊鈕被按下");
-        //發出電擊警告音400ms
+        //Warning signals for 400ms
         digitalWrite(10, HIGH);
         delay(400);
         digitalWrite(10, LOW);
-        //完成警示
+        //Warning finished
        }
        else {
         butt = false;
@@ -339,14 +329,14 @@ void buzzer_control(){
       buzzer_state = LOW;
       cprbeep = false;
       digitalWrite(10, LOW);
-      myDFPlayer.loop(4); //時間到重覆撥放"不要觸碰病人，正在分析"
+      myDFPlayer.loop(4); //2 minutes up, loop "Evaluating heart rhythm, do not touch the patient"
     }
     else {
       long current_time4 = millis();
        if (current_time4 - pre_time_beep > buzzer_time ){
           pre_time_beep = current_time4;
            beeped = true;
-        //判斷迴圈，如果Buzzer已經在叫，改成閉嘴400ms，如果沒有叫，那就叫200ms
+        //If buzzer is beeping, silent it for 400 ms, else, beep for 200 ms
           if (buzzer_state == HIGH) {
            buzzer_state = LOW;
            buzzer_time = 400;
