@@ -12,22 +12,39 @@ To help the publics understand when to use an AED and how it work, it's necessar
 This project requires the items as follow:
 
 Arduino Pro Mini X1
+
 DFPlayer Mini Module X1
+
 microSD card X1
+
 5V LED X3
+
 IRM-3638N3 IR Receiver X1
+
 IR Remote control X1
+
 Momentary Switch with LED X1
+
 Seesaw Switch with LED X1
+
 5V 3W 4Ω Speaker X1
+
 1/4W 220Ω Resistor X5
+
 1/4W 1KΩ Resistor X1
+
 1/4W 10KΩ Resistor X1
+
 3W 4Ω Speaker X1
+
 5V buzzer X1
+
 LM2596 DC-DC module X1 (Calibrated to 5V output)
+
 9V battery X1
+
 Wires and a circuit board
+
 Suitable case for all the electronics
 
 # Audio Files
